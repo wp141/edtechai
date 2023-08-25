@@ -17,12 +17,13 @@ interface MainLinkProps {
 
 function MainLink({ icon, color, label, link }: MainLinkProps) {
   return (
-    <Link to={link}>
+    <Link to={link} style={{ textDecoration: 'none' }}>
         <UnstyledButton
         sx={(theme) => ({
             display: 'block',
             width: '100%',
             padding: theme.spacing.xs,
+            paddingBlock: theme.spacing.lg,
             borderRadius: theme.radius.sm,
             color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
 
@@ -37,7 +38,7 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
             {icon}
             </ThemeIcon>
 
-            <Text size="sm">{label}</Text>
+            <Text size="lg">{label}</Text>
         </Group>
         </UnstyledButton>
     </Link>

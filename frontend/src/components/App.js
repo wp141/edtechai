@@ -33,7 +33,7 @@ function App() {
           asideOffsetBreakpoint="sm"
           navbar={
             <Navbar p="md" hiddenBreakpoint="sm" hidden={!opened} width={{ sm: 200, lg: 300 }}>
-              <MainLinks/>
+              <MainLinks className="main-links"/>
             </Navbar>
           }
           header={

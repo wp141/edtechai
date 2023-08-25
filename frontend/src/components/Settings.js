@@ -4,7 +4,7 @@ import React from 'react'
 export default function Settings() {
   return (
     <div>
-        <Text fz="lg" p="xs">Settings</Text>
+        <Text fz="lg" p="md">Settings</Text>
     </div>
   )
 }
