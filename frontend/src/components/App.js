@@ -14,6 +14,7 @@ import {
   useMantineTheme}  from '@mantine/core';
 import Courses from './Courses';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Course from './Course';
 
 function App() {
 
@@ -49,7 +50,7 @@ function App() {
                   />
                 </MediaQuery>
                 
-                <Text>EdTech AI Demo</Text>
+                <Text fz="xl">EdTech AI Demo</Text>
               </div>
             </Header>
           }
@@ -59,6 +60,7 @@ function App() {
             <Route path="/generate" element={<Generate />}/>
             <Route path="/marking" element={<Marking />}/>
             <Route path="/settings" element={<Settings />}/>
+            <Route path="/:id" element={<Course/>} />
           </Routes>
          
 

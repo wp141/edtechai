@@ -1,0 +1,16 @@
+.courses-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.courses-modal > button {
+    padding-block: 4rem;
+}
+
+/* .courses-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+} */

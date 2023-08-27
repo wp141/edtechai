@@ -8,6 +8,6 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <MantineProvider withGlobalStyles withNormalizeCSS>
-       <App/>
-    </MantineProvider>
+    <App/>
+  </MantineProvider>
 );
