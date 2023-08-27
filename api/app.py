@@ -2,12 +2,15 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import pymongo
 import certifi
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
 try:
-    URI = "mongodb+srv://api-user:aKGnkVviIyKxXoNt@cluster0.agzaxfd.mongodb.net/?retryWrites=true&w=majority"
+    URI = os.getenv("MONGODB_URI")
     client = pymongo.MongoClient(URI, tlsCAFile=certifi.where())
    
     client.admin.command('ping')
@@ -15,7 +18,6 @@ try:
  
 except Exception as e:
     print("An Invalid URI host error was received. Is your Atlas host name correct in your connection string?")
-    print(e)
     exit()
 
 db = client.testing
