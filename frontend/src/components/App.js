@@ -56,13 +56,12 @@ function App() {
           }
         >
           <Routes>
-            <Route path="/" element={<Courses />}/>
+            <Route path="/courses" element={<Courses />}/>
             <Route path="/generate" element={<Generate />}/>
             <Route path="/marking" element={<Marking />}/>
             <Route path="/settings" element={<Settings />}/>
-            <Route path="/:id" element={<Course/>} />
+            <Route path="/courses/:id" element={<Course/>} />
           </Routes>
-         
 
         </AppShell>
       </BrowserRouter>

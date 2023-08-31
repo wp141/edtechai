@@ -6,7 +6,7 @@ import {
   IconBulb,
 } from '@tabler/icons-react';
 import { ThemeIcon, UnstyledButton, Group, Text } from '@mantine/core';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 interface MainLinkProps {
   icon: React.ReactNode;
@@ -16,6 +16,10 @@ interface MainLinkProps {
 }
 
 function MainLink({ icon, color, label, link }: MainLinkProps) {
+
+  const location = useLocation()
+  console.log(location.pathname)
+
   return (
     <Link to={link} style={{ textDecoration: 'none' }}>
         <UnstyledButton
@@ -26,10 +30,11 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
             paddingBlock: theme.spacing.lg,
             borderRadius: theme.radius.sm,
             color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
+            backgroundColor: !location.pathname.startsWith(link) ? "" : theme.colors.gray[0],
 
             '&:hover': {
             backgroundColor:
-                theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+              location.pathname.startsWith(link) ? (theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0]) : ""
             },
         })}
         >
@@ -46,13 +51,13 @@ function MainLink({ icon, color, label, link }: MainLinkProps) {
 }
 
 const data = [
-  { icon: <IconBooks size="4rem" />, color: 'blue', label: 'Courses', link: "/" },
+  { icon: <IconBooks size="4rem" />, color: 'blue', label: 'Courses', link: "/courses" },
   { icon: <IconBulb size="4rem" />, color: 'teal', label: 'Generate', link: "/generate" },
   { icon: <IconTargetArrow size="4rem" />, color: 'violet', label: 'Marking', link: "/marking" },
   { icon: <IconSettings size="4rem" />, color: 'grape', label: 'Settings', link: "/settings" },
 ];
 
 export function MainLinks() {
-  const links = data.map((link) => <MainLink {...link} key={link.label} />);
+  const links = data.map((link) => <MainLink {...link} key={link.label}/>);
   return <div>{links}</div>;
 }

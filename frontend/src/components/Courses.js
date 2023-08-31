@@ -1,9 +1,9 @@
 import { Text, Container, Grid, Button, Progress, Loader, Modal, TextInput } from '@mantine/core'
-import { useForm } from '@mantine/form';
 import React, { useEffect, useState } from 'react'
 import Course from './tiles/CourseTile'
 import '../css/Courses.css';
 import { config } from '../constants'
+import { IconPlus } from '@tabler/icons-react';
 
 export default function Courses() {
 
@@ -58,7 +58,8 @@ export default function Courses() {
     <div className="courses">
       <div className="courses-header">
         <Text fw={500} fz="lg" m="md">Courses</Text>
-        <Button m="md" variant="light" onClick={() => setCreating(true)}>Create</Button>
+        <Button m="md" onClick={() => setCreating(true)}><IconPlus size={18}/></Button>
+        {/* <IconPhotoCirclePlus></IconPhotoCirclePlus> */}
       </div>
       {loading ? 
         <div className="courses-loading">
