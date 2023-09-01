@@ -1,4 +1,4 @@
-import { Text, Button, FileInput, Modal, Loader } from '@mantine/core'
+import { Text, Button, FileInput, Modal, Loader, Table } from '@mantine/core'
 import React, {useEffect, useState} from 'react'
 import { useLocation, Link } from 'react-router-dom';
 import { IconUpload } from '@tabler/icons-react';
@@ -6,6 +6,15 @@ import { config } from '../constants'
 import '../css/Course.css';
 
 function Course({course}) {
+
+    const ths = (
+        <tr>
+          <th>Resource Name</th>
+          <th>Upload Date</th>
+          <th>Uploader</th>
+          <th>Source</th>
+        </tr>
+    );
 
     const { state } = useLocation();
     const [toggleUpload, setToggleUpload] = useState(false);
@@ -61,19 +70,27 @@ function Course({course}) {
                 <Text fw={500} m="md" td="underline">{state.course.name}</Text>
                 <Button m="md" onClick={() => setToggleUpload(true)}>Add Resource</Button>
             </div>
-            <Text mx="md" td="underline">Course Resources</Text>
+            {/* <Text mx="md" td="underline">Course Resources</Text> */}
             {loading ? 
                 <Loader mx="md"/> 
                 : 
-                <>
+                <Table m="md" striped highlightOnHover withBorder>
+                    <thead>{ths}</thead>
+                    <tbody>
                     {courseData !== null && courseData.resources.length > 0 ? 
                         courseData.resources.map((resource) => (
-                            <Text fz="sm" mx="md" key={resource._id}>{resource.filename}</Text>
+                            <tr key={resource._id}>
+                                <td>{resource.filename}</td>
+                                <td>{resource.uploadDate}</td>
+                                <td>{resource.uploader}</td>
+                                <td><IconUpload/></td>
+                            </tr>
                         ))
                         : 
                         <></>
                     }
-                </>
+                    </tbody>
+                </Table>
                 
             }
             <Modal opened={toggleUpload} onClose={() => (setToggleUpload(false))} title="Upload New Course Resource" centered className="resource-modal">

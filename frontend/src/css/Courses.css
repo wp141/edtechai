@@ -1,6 +1,7 @@
 .courses-header {
     display: flex;
     justify-content: space-between;
+    align-items: start;
 }
 
 .courses-modal > button {
