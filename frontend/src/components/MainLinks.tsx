@@ -18,7 +18,6 @@ interface MainLinkProps {
 function MainLink({ icon, color, label, link }: MainLinkProps) {
 
   const location = useLocation()
-  console.log(location.pathname)
 
   return (
     <Link to={link} style={{ textDecoration: 'none' }}>

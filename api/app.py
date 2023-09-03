@@ -4,9 +4,11 @@ from dotenv import load_dotenv
 from bson.objectid import ObjectId
 from werkzeug.utils import secure_filename
 from langchain.embeddings import OpenAIEmbeddings
+from langchain.llms import OpenAI
 from langchain.vectorstores import Pinecone
 from langchain.document_loaders import UnstructuredPDFLoader, OnlinePDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.chains.question_answering import load_qa_chain
 import pinecone
 import pymongo
 import certifi
@@ -15,10 +17,10 @@ import openai
 import os
 
 app = Flask(__name__)
-CORS(app)
 app.config['UPLOAD_FOLDER'] = "./temp/"
 load_dotenv()
 index_name = "dev"
+CORS(app)
 
 try:
     URI = os.getenv("MONGODB_URI")
@@ -77,7 +79,7 @@ def courses():
 
     return jsonify(course_arr), 200
 
-@app.route("/resource", methods=["POST"])
+@app.route("/resource", methods=["POST", "DELETE"])
 def resource():
     if request.method == "POST":
         file = request.files['file']
@@ -86,23 +88,111 @@ def resource():
 
         course = request.form.get("course")
         file_metadata_id = fs.put(file, filename=file.filename)
-        res = db.courses.update_one({"_id": ObjectId(course)}, {"$push": {"resources": file_metadata_id}})
+        db.courses.update_one({"_id": ObjectId(course)}, {"$push": {"resources": file_metadata_id}})
 
         loader = UnstructuredPDFLoader(path)
         data = loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=4096, chunk_overlap=0)
+        text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
         texts = text_splitter.split_documents(data)
-        os.remove(path)
+        os.remove(path) 
+        for t in texts:
+            t.metadata = {"course": course, "resource_id": file_metadata_id}
 
-        embeddings = openai.Embedding.create(input = [t.page_content for t in texts], model="text-embedding-ada-002")['data'][0]['embedding']
+        embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=os.getenv("OPENAI_API_KEY"))
+        Pinecone.from_documents(texts, embeddings, index_name=index_name)
+
+    elif request.method == "DELETE":
+        course = request.args.get("course")
+        resource = request.form.get("resource")
+
+        db.courses.update_one({"_id": ObjectId(course)}, {"$pull": {"resources": resource}})
+        fs.delete(resource)
+
+        # not supported by gcp starter pinecone env -> need to upgrade
         index = pinecone.Index(index_name)
-        index.upsert([(str(file_metadata_id), embeddings, {"course" : course})])
-        # print(len(embeddings))
-        # print(embeddings[0])
-        # labelled_embeddings = [(e, course) for e in embeddings]
-        # print(labelled_embeddings)
+        index.delete(filter={"resource_id" : resource})
 
     return "", 200
 
+@app.route("/generate", methods=["POST"])
+def generate():
+    course = request.form.get("course")
+    topic = request.form.get("topic")
+    number = request.form.get("number")   
+    year = request.form.get("year")   
+    difficulty = request.form.get("difficulty")   
+    solutions = bool(request.form.get("solutions"))
+
+    print(request.form.get("solutions"))
+
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+    index = Pinecone.from_existing_index("dev", embeddings)
+
+    llm = OpenAI(temperature=0.7, openai_api_key="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")
+    chain = load_qa_chain(llm, chain_type="stuff")
+
+    i = 1
+    
+    question_arr = []
+    while i < int(number) + 1: 
+        query = f"""
+        Write a question assessing a year {year} student's knowledge of {topic}.
+        The question should be {difficulty} difficulty and be at least two sentences. 
+        reface the question with Question {i}:.
+        """
+
+        response = ""
+        docs = index.similarity_search(query=query, filter={"course": course})
+        if len(docs) > 0:
+            response += chain.run(input_documents=docs, question=query)
+            response += "\n"
+            question_arr.append(response)
+
+        i += 1
+    
+    solution_arr = []
+    if solutions:
+        for i in range (0, len(question_arr)):
+            query = f"""
+            Generate a year {year} student level solution to the question "{question_arr[i]}".
+            Preface the solution with Solution {i + 1}:.
+            """
+            response = ""
+            docs = index.similarity_search(query=query, filter={"course": course})
+            if len(docs) > 0:
+                response += chain.run(input_documents=docs, question=query)
+                response += "\n"
+                solution_arr.append(response)
+
+
+    return jsonify({
+        "questions": question_arr,
+        "solutions": solution_arr,
+        }), 200
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=8000, debug=True)
+
+
+    # print(type(embeddings))
+    # print(embeddings)
+
+    # Pinecone.add_documents(texts[0], embeddings)
+    
+
+    # embeddings = openai.Embedding.create(input = [t.page_content for t in texts], model="text-embedding-ada-002")['data'][0]['embedding']
+    # documents = Pinecone(index_name, OpenAIEmbeddings().embed_query, "text").aadd_documents(embeddings)
+    # index = pinecone.Index(index_name)
+    # embed = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=os.getenv("OPENAI_API_KEY"))
+    # vectorstore = Pinecone(index, embed.embed_query, "text")
+
+    # for i, record in texts:
+
+    # print(vectorstore)
+    # print(documents)
+    # index.upsert(texts)
+    
+    # index.upsert([{"id": str(file_metadata_id), "values": embeddings, "metadata": {"course": course, "text": ""}}])
+    # labelled_embeddings = [(e, course) for e in embeddings]
+    # results = pinecone.Index(index_name).query(queries=[topic], top_k=10)
+    # print(results)
