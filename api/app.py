@@ -46,7 +46,9 @@ def course():
     courses = db.courses
     if request.method == "POST":
         course = request.json
+        course["resources"] = []
         courses.insert_one(course)
+        return "", 200
 
     elif request.method == "GET":
         id = request.args.get("id")
@@ -64,8 +66,8 @@ def course():
             course["resources"] = []
 
         course["_id"] = str(course["_id"])
-
-    return jsonify(course), 200
+        return jsonify(course), 200
+    
 
 @app.route("/courses", methods=["GET"])
 def courses():
@@ -96,7 +98,7 @@ def resource():
         texts = text_splitter.split_documents(data)
         os.remove(path) 
         for t in texts:
-            t.metadata = {"course": course, "resource_id": file_metadata_id}
+            t.metadata = {"course": course, "resource_id": str(file_metadata_id)}
 
         embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", openai_api_key=os.getenv("OPENAI_API_KEY"))
         Pinecone.from_documents(texts, embeddings, index_name=index_name)
@@ -114,8 +116,8 @@ def resource():
 
     return "", 200
 
-@app.route("/generate", methods=["POST"])
-def generate():
+@app.route("/generate-questions", methods=["POST"])
+def generate_questions():
     course = request.form.get("course")
     topic = request.form.get("topic")
     number = request.form.get("number")   
@@ -123,12 +125,10 @@ def generate():
     difficulty = request.form.get("difficulty")   
     solutions = bool(request.form.get("solutions"))
 
-    print(request.form.get("solutions"))
-
     embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
     index = Pinecone.from_existing_index("dev", embeddings)
 
-    llm = OpenAI(temperature=0.7, openai_api_key="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")
+    llm = OpenAI(temperature=0.7, openai_api_key=os.getenv("OPENAI_API_KEY"))
     chain = load_qa_chain(llm, chain_type="stuff")
 
     i = 1
@@ -136,9 +136,8 @@ def generate():
     question_arr = []
     while i < int(number) + 1: 
         query = f"""
-        Write a question assessing a year {year} student's knowledge of {topic}.
+        Write a question assessing a year {year} student's knowledge of {topic} that you know the answer to.
         The question should be {difficulty} difficulty and be at least two sentences. 
-        reface the question with Question {i}:.
         """
 
         response = ""
@@ -151,11 +150,11 @@ def generate():
         i += 1
     
     solution_arr = []
-    if solutions:
+    if solutions == True:
         for i in range (0, len(question_arr)):
             query = f"""
             Generate a year {year} student level solution to the question "{question_arr[i]}".
-            Preface the solution with Solution {i + 1}:.
+            The solution length should correspond to the difficulty level, which is {difficulty}.
             """
             response = ""
             docs = index.similarity_search(query=query, filter={"course": course})
@@ -169,6 +168,33 @@ def generate():
         "questions": question_arr,
         "solutions": solution_arr,
         }), 200
+
+@app.route("/generate-assignment", methods=["POST"])
+def generate_assignment():
+    course = request.form.get("course")
+    topic = request.form.get("topic")
+    year = request.form.get("year")   
+    difficulty = request.form.get("difficulty") 
+    criteria = bool(request.form.get("criteria"))  
+    # group = bool(request.form.get("group"))  
+    form = request.form.get("form")
+
+    embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
+    index = Pinecone.from_existing_index("dev", embeddings)
+
+    llm = OpenAI(temperature=0.7, openai_api_key=os.getenv("OPENAI_API_KEY"))
+    chain = load_qa_chain(llm, chain_type="stuff")
+
+    query = f"""
+        Write an assignment specification that students will receive, assessing a year {year} student's knowledge of {topic}.
+        The assignment should be {difficulty} difficulty. The assignment should be in {form} format.
+        """
+    response = ""
+    docs = index.similarity_search(query=query, filter={"course": course})
+    if len(docs) > 0:
+        response += chain.run(input_documents=docs, question=query)
+
+    return jsonify({"assignment" : response}), 200
 
 if __name__ == "__main__":
     app.run(port=8000, debug=True)

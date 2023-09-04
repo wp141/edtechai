@@ -2,4 +2,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    margin: 1rem;
 }
+
+.course-header-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+

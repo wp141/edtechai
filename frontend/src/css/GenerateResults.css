@@ -1,3 +1,14 @@
-.results-page {
+.results {
     margin: 1rem;
+}
+
+.results-paper {
+    padding: 1rem;
+    margin-block: 2rem;
+}
+
+.results-tools {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
 }

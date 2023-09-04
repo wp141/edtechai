@@ -84,8 +84,12 @@ function Course({course}) {
     return (
         <div>  
             <div className="course-header">
-                <Text fw={500} m="md" td="underline">{state.course.name}</Text>
-                <Button m="md" onClick={() => setToggleUpload(true)}>Add Resource</Button>
+                <Text fw={500} td="underline">{state.course.name}</Text>
+                <div className="course-header-buttons">
+                    <Button onClick={() => setToggleUpload(true)}>Add Resource</Button>
+                    <Button ml="xs" color="red"><IconTrash/></Button>
+                </div>
+                
             </div>
             {/* <Text mx="md" td="underline">Course Resources</Text> */}
             <div className="resources-table" style={{marginRight: "2rem"}}>
