@@ -1,8 +1,8 @@
 import { Paper, Text, HoverCard, ActionIcon, Loader, Affix, Button, rem } from '@mantine/core'
 import React from 'react'
 import '../css/GenerateResults.css';
-import { IconMessage, IconPencil, IconRotateClockwise, IconTrash } from '@tabler/icons-react';
-import GeneratePaper from './GeneratePaper';
+import { IconChevronsRight, IconMessage, IconPencil, IconRotateClockwise, IconTrash } from '@tabler/icons-react';
+import GeneratePaper from './tiles/GeneratePaper';
 
 export default function GenerateResults({props}) {
 
@@ -18,7 +18,7 @@ export default function GenerateResults({props}) {
                         )
                     })}
                     <Affix position={{ bottom: rem(40), right: rem(40) }}>
-                        <Button size="lg" onClick={() => props.nextStep()}>Next</Button>
+                        <Button size="lg" onClick={() => props.nextStep()}>Next<IconChevronsRight/></Button>
                     </Affix>
                 </>
                

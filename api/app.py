@@ -126,6 +126,9 @@ def generate_questions():
     difficulty = request.form.get("difficulty")   
     solutions = bool(request.form.get("solutions"))
 
+    print(topic)
+    # return "", 200
+
     embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
     index = Pinecone.from_existing_index("dev", embeddings)
 
@@ -166,6 +169,7 @@ def generate_questions():
     return jsonify({
         "questions": question_arr,
         "solutions": solution_arr,
+        "topic" : topic,
         }), 200
 
 @app.route("/generate-assignment", methods=["POST"])

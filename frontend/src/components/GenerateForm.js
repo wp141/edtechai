@@ -5,6 +5,9 @@ import '../css/Generate.css';
 
 export default function GenerateForm({props, refs}) {
 
+    console.log(refs);
+    console.log(props);
+
     return (
         <div>
             <Tabs defaultValue="questions">
@@ -24,15 +27,15 @@ export default function GenerateForm({props, refs}) {
                         onChange={(event) => props.setCourse(event.currentTarget.value)}
 
                         />
-                        <TextInput ref={refs.topic} label="Topic Area" placeholder="Topic"/>
+                        <TextInput ref={refs.topicQ} label="Topic Area" placeholder="Topic"/>
                         
                         <NativeSelect
                         label="Year Level"
                         data={["5","6","7","8","9","10","11","12"]}
                         defaultValue={"12"}
-                        ref={refs.year}
+                        ref={refs.yearQ}
                         />
-                        <Checkbox my="sm" label="Generate Solutions" ref={refs.genSolutions} defaultChecked={false}/>
+                        <Checkbox my="sm" label="Generate Solutions" ref={refs.genSolutionsQ} defaultChecked={false}/>
                         
                     </Grid.Col>
                     <Grid.Col sm={12} lg={6}>
@@ -40,13 +43,13 @@ export default function GenerateForm({props, refs}) {
                             label="Difficulty Level"
                             data={["Easy", "Medium", "Hard"]}
                             defaultValue={"Easy"}
-                            ref={refs.difficulty}
+                            ref={refs.difficultyQ}
                         />
-                        <NumberInput label="Number of Questions" defaultValue={1} ref={refs.number}/>
+                        <NumberInput label="Number of Questions" defaultValue={1} ref={refs.numberQ}/>
                         <NativeSelect 
                         label="Question Styling"
                         data={["None", "NESA Verbs", "IB Command Terms"]}
-                        ref={refs.styling}
+                        ref={refs.stylingQ}
                         />
                     
                     </Grid.Col>
@@ -59,7 +62,7 @@ export default function GenerateForm({props, refs}) {
 
                 <Tabs.Panel value="assignment" pt="xs">
                 <form>
-                    <TextInput ref={refs.topic} label="Topic Area" placeholder="Topic"/>
+                    {/* <TextInput ref={refs.topic} label="Topic Area" placeholder="Topic"/> */}
                     <NativeSelect
                     label="Year Level"
                     data={["5","6","7","8","9","10","11","12"]}
@@ -93,7 +96,7 @@ export default function GenerateForm({props, refs}) {
 
                 <Tabs.Panel value="exam" pt="xs">
                 <form>
-                    <TextInput ref={refs.topic} label="Topic Area" placeholder="Topic"/>
+                    {/* <TextInput ref={refs.topic} label="Topic Area" placeholder="Topic"/> */}
                     <NativeSelect
                     label="Year Level"
                     data={["5","6","7","8","9","10","11","12"]}

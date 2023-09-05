@@ -4,6 +4,7 @@ import { config } from '../constants'
 import '../css/Generate.css';
 import GenerateResults from './GenerateResults';
 import GenerateForm from './GenerateForm';
+import GenerateDocEditor from './GenerateDocEditor';
 
 export default function Generate() {
 
@@ -17,12 +18,20 @@ export default function Generate() {
   // const [showResults, setShowResults] = useState(false);
   
   // Question Gen States
-  const topic = useRef("");
-  const year = useRef("12");
-  const difficulty = useRef("Easy");
-  const number = useRef(1);
-  const styling = useRef("None");
-  const genSolutions = useRef(false);
+  const topicQ = useRef("");
+  const yearQ = useRef("12");
+  const difficultyQ = useRef("Easy");
+  const numberQ = useRef(1);
+  const stylingQ = useRef("None");
+  const genSolutionsQ = useRef(false);
+  const questionRefs = {
+    topicQ,
+    yearQ,
+    difficultyQ,
+    numberQ,
+    stylingQ,
+    genSolutionsQ,
+  }
 
   // Stepper States
 
@@ -50,17 +59,21 @@ export default function Generate() {
 
   async function generateQuestions(e) {
     e.preventDefault();
+    console.log(topicQ);
+
+    const formData = new FormData(e.target);
+    formData.append("course", course);
+    formData.append("topic", topicQ.current.value);
+    formData.append("year", yearQ.current.value);
+    formData.append("difficulty", difficultyQ.current.value);
+    formData.append("number", numberQ.current.value);
+    formData.append("styling", stylingQ.current.value);
+    formData.append("solutions", genSolutionsQ.current.checked);
+
+    console.log(formData);
     setGenerating(true);
     setResults({});
     nextStep();
-    const formData = new FormData(e.target);
-    formData.append("course", course);
-    formData.append("topic", topic.current.value);
-    formData.append("year", year.current.value);
-    formData.append("difficulty", difficulty.current.value);
-    formData.append("number", number.current.value);
-    formData.append("styling", styling.current.value);
-    formData.append("solutions", genSolutions.current.checked);
 
     const reqURL = config.url.API_URL.concat("/generate-questions");
     fetch(reqURL, {
@@ -69,6 +82,7 @@ export default function Generate() {
     .then(res => {
       if (res.status == 200) {
         res.json().then(data => {
+          console.log(data);
           setResults(data);
           setGenerating(false);
         })
@@ -90,14 +104,14 @@ export default function Generate() {
         <Stepper px="md" m="md" active={active} onStepClick={setActive} breakpoint="sm" allowNextStepsSelect={false}>
           <Stepper.Step label="Describe" description="Describe" allowNextStepsSelect={false}>
           <div className="generate-form">
-            <GenerateForm props={{courses, course, setCourse, generateQuestions}} refs={{topic, year, difficulty, number, styling, genSolutions}}/>
+            <GenerateForm props={{courses, course, setCourse, generateQuestions}} refs={{...questionRefs}}/>
         </div>
           </Stepper.Step>
           <Stepper.Step label="Review" description="Review" allowNextStepsSelect={false} loading={generating}>
             <GenerateResults props={{results, selected, setSelected, nextStep}}/>
           </Stepper.Step>
           <Stepper.Step label="Finalise" description="Finalise" allowNextStepsSelect={false}>
-            Step 3 content: Get full access
+            <GenerateDocEditor props={{results}} refs={{topicQ}}/>
           </Stepper.Step>
           <Stepper.Completed>
             Completed, click back button to get to previous step
