@@ -21,6 +21,7 @@ app.config['UPLOAD_FOLDER'] = "./temp/"
 load_dotenv()
 index_name = "dev"
 CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 try:
     URI = os.getenv("MONGODB_URI")
@@ -131,10 +132,10 @@ def generate_questions():
     llm = OpenAI(temperature=0.7, openai_api_key=os.getenv("OPENAI_API_KEY"))
     chain = load_qa_chain(llm, chain_type="stuff")
 
-    i = 1
+    print(number)
     
     question_arr = []
-    while i < int(number) + 1: 
+    for i in range (0, int(number)):
         query = f"""
         Write a question assessing a year {year} student's knowledge of {topic} that you know the answer to.
         The question should be {difficulty} difficulty and be at least two sentences. 
@@ -146,8 +147,6 @@ def generate_questions():
             response += chain.run(input_documents=docs, question=query)
             response += "\n"
             question_arr.append(response)
-
-        i += 1
     
     solution_arr = []
     if solutions == True:
@@ -163,7 +162,7 @@ def generate_questions():
                 response += "\n"
                 solution_arr.append(response)
 
-
+    print(question_arr)
     return jsonify({
         "questions": question_arr,
         "solutions": solution_arr,

@@ -4,9 +4,9 @@
     align-items: center;
 }
 
-.generate-form {
+/* .generate-form {
     margin-inline: 1rem;
-}
+} */
 
 .generate-coursepicker {
     width: 30%;
@@ -23,8 +23,9 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    width: 50%;
 }
 
-input {
-    /* max-width: 50%; */
-}
+/* input {
+    max-width: 50%;
+} */

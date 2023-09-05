@@ -1,32 +1,32 @@
-import { Paper, Text, HoverCard, ActionIcon } from '@mantine/core'
+import { Paper, Text, HoverCard, ActionIcon, Loader, Affix, Button, rem } from '@mantine/core'
 import React from 'react'
 import '../css/GenerateResults.css';
 import { IconMessage, IconPencil, IconRotateClockwise, IconTrash } from '@tabler/icons-react';
+import GeneratePaper from './GeneratePaper';
 
-export default function GenerateResults({data}) {
-    
+export default function GenerateResults({props}) {
+
+    console.log(props);
     return (
         <div className="results">
-            {/* <Paper className="results-paper" shadow="md"> */}
-                {data && data.questions.map((question, i) => {
-                    return (
-                        <HoverCard width={200} shadow="md">
-                            <HoverCard.Target>
-                                <Paper withBorder className="results-paper" shadow="md">   
-                                    <Text my="sm">{question}</Text>
-                                    <Text mb="lg" p>{data.solutions[i]}</Text>
-                                </Paper>
-                            </HoverCard.Target>
-                            <HoverCard.Dropdown className="results-tools">
-                                <ActionIcon><IconRotateClockwise/></ActionIcon>
-                                <ActionIcon color="red"><IconTrash/></ActionIcon>
-                                <ActionIcon><IconPencil/></ActionIcon>
-                                <ActionIcon><IconMessage/></ActionIcon>
-                            </HoverCard.Dropdown>
-                        </HoverCard>
-                    
-                    )
-                })}
+            {props.results.questions ? 
+                <>
+                    {props.results.questions.map((question, i) => {
+                        const solution = props.results.solutions[i];
+                        return (
+                            <GeneratePaper props={{question, solution, ...props}} />
+                        )
+                    })}
+                    <Affix position={{ bottom: rem(40), right: rem(40) }}>
+                        <Button size="lg" onClick={() => props.nextStep()}>Next</Button>
+                    </Affix>
+                </>
+               
+                : 
+                <>
+                    {/* <Loader className="results-loader"/> */}
+                </>
+            }
             
             
         </div>

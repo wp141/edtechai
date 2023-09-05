@@ -1,8 +1,9 @@
-import { NativeSelect, NumberInput, Tabs, Text, TextInput, Button, Checkbox, Loader, Radio, Group } from '@mantine/core'
+import { NativeSelect, NumberInput, Tabs, Text, TextInput, Button, Checkbox, Loader, Radio, Group, Stepper, Grid } from '@mantine/core'
 import React, {useState, useEffect, useRef} from 'react'
 import { config } from '../constants'
 import '../css/Generate.css';
 import GenerateResults from './GenerateResults';
+import GenerateForm from './GenerateForm';
 
 export default function Generate() {
 
@@ -11,7 +12,9 @@ export default function Generate() {
   const [generating, setGenerating] = useState(false);
   const [course, setCourse] = useState(null);
   const [results, setResults] = useState({});
-  const [showResults, setShowResults] = useState(false);
+
+  const [selected, setSelected] = useState({questions: [], solutions: []});
+  // const [showResults, setShowResults] = useState(false);
   
   // Question Gen States
   const topic = useRef("");
@@ -20,6 +23,12 @@ export default function Generate() {
   const number = useRef(1);
   const styling = useRef("None");
   const genSolutions = useRef(false);
+
+  // Stepper States
+
+  const [active, setActive] = useState(0);
+  const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));
+  const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
 
   async function getCourses() {
     setLoading(true);
@@ -42,8 +51,9 @@ export default function Generate() {
   async function generateQuestions(e) {
     e.preventDefault();
     setGenerating(true);
-    const formData = new FormData();
-
+    setResults({});
+    nextStep();
+    const formData = new FormData(e.target);
     formData.append("course", course);
     formData.append("topic", topic.current.value);
     formData.append("year", year.current.value);
@@ -52,16 +62,15 @@ export default function Generate() {
     formData.append("styling", styling.current.value);
     formData.append("solutions", genSolutions.current.checked);
 
-    const reqURL = config.url.API_URL.concat("/generate");
+    const reqURL = config.url.API_URL.concat("/generate-questions");
     fetch(reqURL, {
         method: 'POST',
         body: formData})
     .then(res => {
       if (res.status == 200) {
         res.json().then(data => {
-          setGenerating(false);
           setResults(data);
-          setShowResults(true);
+          setGenerating(false);
         })
       } else {
         setGenerating(false);
@@ -78,110 +87,28 @@ export default function Generate() {
         <div className="generate-header">
           <Text fw={500} fz="lg" p="md">Generate</Text>
         </div>
-        {showResults ? <GenerateResults data={results}/>
+        <Stepper px="md" m="md" active={active} onStepClick={setActive} breakpoint="sm" allowNextStepsSelect={false}>
+          <Stepper.Step label="Describe" description="Describe" allowNextStepsSelect={false}>
+          <div className="generate-form">
+            <GenerateForm props={{courses, course, setCourse, generateQuestions}} refs={{topic, year, difficulty, number, styling, genSolutions}}/>
+        </div>
+          </Stepper.Step>
+          <Stepper.Step label="Review" description="Review" allowNextStepsSelect={false} loading={generating}>
+            <GenerateResults props={{results, selected, setSelected, nextStep}}/>
+          </Stepper.Step>
+          <Stepper.Step label="Finalise" description="Finalise" allowNextStepsSelect={false}>
+            Step 3 content: Get full access
+          </Stepper.Step>
+          <Stepper.Completed>
+            Completed, click back button to get to previous step
+          </Stepper.Completed>
+        </Stepper>
+        {/* {showResults ? <GenerateResults data={results}/>
         :
         generating ? <Loader className="generate-loader"/> 
         :
-        <div className="generate-form">
-            <NativeSelect
-              label="Select Course"
-              data={courses.map((course) => ({value: course._id, label: course.name, key: course._id}))}
-              onChange={(event) => setCourse(event.currentTarget.value)}
-              description="Generation will use the content from this course"
-              className="generate-coursepicker"
-            />
-            <Tabs defaultValue="questions">
-              <Tabs.List>
-                <Tabs.Tab value="questions">Questions</Tabs.Tab>
-                <Tabs.Tab value="assignment">Assignment</Tabs.Tab>
-                <Tabs.Tab value="exam">Exam</Tabs.Tab>
-              </Tabs.List>
-
-              <Tabs.Panel value="questions" pt="xs">
-                <form onSubmit={generateQuestions}>
-                  <TextInput ref={topic} label="Topic Area" placeholder="Topic"/>
-                  <NativeSelect
-                    label="Year Level"
-                    data={["5","6","7","8","9","10","11","12"]}
-                    defaultValue={"12"}
-                    ref={year}
-                  />
-                  <NativeSelect
-                    label="Difficulty Level"
-                    data={["Easy", "Medium", "Hard"]}
-                    defaultValue={"Easy"}
-                    ref={difficulty}
-                  />
-                  <NumberInput label="Number of Questions" defaultValue={1} ref={number}/>
-                  <NativeSelect 
-                    label="Question Styling"
-                    data={["None", "NESA Verbs", "IB Command Terms"]}
-                    ref={styling}
-                  />
-                  <Checkbox my="sm" label="Generate Solutions" ref={genSolutions} defaultChecked={false}/>
-                  <Button my="sm" variant="light" type="submit" disabled={generating}>Generate</Button>
-                </form>
-              </Tabs.Panel>
-
-              <Tabs.Panel value="assignment" pt="xs">
-                <form>
-                  <TextInput ref={topic} label="Topic Area" placeholder="Topic"/>
-                  <NativeSelect
-                    label="Year Level"
-                    data={["5","6","7","8","9","10","11","12"]}
-                    defaultValue={"12"}
-                    ref={year}
-                  />
-                  <NativeSelect
-                    label="Difficulty Level"
-                    data={["Easy", "Medium", "Hard"]}
-                    defaultValue={"Easy"}
-                    ref={difficulty}
-                  />
-                  <NativeSelect
-                    label="Assessment Form"
-                    data={["Written", "Video", "Oral"]}
-                    defaultValue={"Easy"}
-                    ref={difficulty}
-                  />
-                  <NumberInput label="Number of Marks" defaultValue={20} ref={number}/>
-                  <Radio.Group my="sm" defaultValue="individual">
-                    <Group>
-                      <Radio value="individual" label="Individual"/>
-                      <Radio value="group" label="Group"/>
-                    </Group>
-                  </Radio.Group>
-                  {/* <Checkbox my="sm" label="Generate Marking Criteria" defaultChecked={false}/> */}
-                  <Button my="sm" variant="light" type="submit" disabled={generating}>Generate</Button>
-                  
-                </form>
-              </Tabs.Panel>
-
-              <Tabs.Panel value="exam" pt="xs">
-                <form>
-                  <TextInput ref={topic} label="Topic Area" placeholder="Topic"/>
-                  <NativeSelect
-                    label="Year Level"
-                    data={["5","6","7","8","9","10","11","12"]}
-                    defaultValue={"12"}
-                    ref={year}
-                  />
-                  {/* <NativeSelect
-                    label="Difficulty Level"
-                    data={["Easy", "Medium", "Hard"]}
-                    defaultValue={"Easy"}
-                    ref={difficulty}
-                  /> */}
-                  <NumberInput label="Number of Mulitple Choice Questions" defaultValue={10}/>
-                  <NumberInput label="Number of Short Answer Questions" defaultValue={5}/>
-                  <NumberInput label="Number of Essay Questions" defaultValue={1}/>
-                  <Button my="sm" variant="light" type="submit" disabled={generating}>Generate</Button>
-                </form>
-              </Tabs.Panel>
-            </Tabs>
-
-        </div>
-        }
+        
+        } */}
         
     </div>
   )
