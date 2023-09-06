@@ -5,6 +5,7 @@ import '../css/Generate.css';
 import GenerateResults from './GenerateResults';
 import GenerateForm from './GenerateForm';
 import GenerateDocEditor from './GenerateDocEditor';
+import GenerateExport from './GenerateExport';
 
 export default function Generate() {
 
@@ -24,6 +25,7 @@ export default function Generate() {
   const numberQ = useRef(1);
   const stylingQ = useRef("None");
   const genSolutionsQ = useRef(false);
+
   const questionRefs = {
     topicQ,
     yearQ,
@@ -33,11 +35,47 @@ export default function Generate() {
     genSolutionsQ,
   }
 
+  // Assignment Gen States
+  const topicA = useRef("");
+  const yearA = useRef("12");
+  const difficultyA = useRef("Easy");
+  const assessmentFormA = useRef("Written");
+  const marksA = useRef(20);
+  const taskForA = useRef("individual");
+  
+  const assignmentRefs = {
+    topicA,
+    yearA,
+    difficultyA,
+    assessmentFormA,
+    marksA,
+    taskForA,
+  }
+
+  // Exam Gen States
+  const topicE = useRef("");
+  const yearE = useRef("12");
+  const difficultyE = useRef("Easy");
+  const multisE = useRef(20);
+  const shortsE = useRef(5);
+  const longsE = useRef(1);
+
+  const examRefs = {
+    topicE,
+    yearE,
+    difficultyE,
+    multisE,
+    shortsE,
+    longsE,
+  }
+
   // Stepper States
 
   const [active, setActive] = useState(0);
   const nextStep = () => setActive((current) => (current < 3 ? current + 1 : current));
   const prevStep = () => setActive((current) => (current > 0 ? current - 1 : current));
+
+  const [docContent, setDocContent] = useState("");
 
   async function getCourses() {
     setLoading(true);
@@ -103,26 +141,18 @@ export default function Generate() {
         </div>
         <Stepper px="md" m="md" active={active} onStepClick={setActive} breakpoint="sm" allowNextStepsSelect={false}>
           <Stepper.Step label="Describe" description="Describe" allowNextStepsSelect={false}>
-          <div className="generate-form">
-            <GenerateForm props={{courses, course, setCourse, generateQuestions}} refs={{...questionRefs}}/>
-        </div>
+            <GenerateForm props={{courses, course, setCourse, generateQuestions}} refs={{...questionRefs, ...assignmentRefs, ...examRefs,}}/>
           </Stepper.Step>
           <Stepper.Step label="Review" description="Review" allowNextStepsSelect={false} loading={generating}>
             <GenerateResults props={{results, selected, setSelected, nextStep}}/>
           </Stepper.Step>
           <Stepper.Step label="Finalise" description="Finalise" allowNextStepsSelect={false}>
-            <GenerateDocEditor props={{results}} refs={{topicQ}}/>
+            <GenerateDocEditor props={{results, nextStep, docContent, setDocContent}} refs={{topicQ}}/>
           </Stepper.Step>
           <Stepper.Completed>
-            Completed, click back button to get to previous step
+            <GenerateExport props={{docContent}}/>
           </Stepper.Completed>
         </Stepper>
-        {/* {showResults ? <GenerateResults data={results}/>
-        :
-        generating ? <Loader className="generate-loader"/> 
-        :
-        
-        } */}
         
     </div>
   )

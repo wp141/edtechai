@@ -1,41 +1,10 @@
+import React from "react";
 import { RichTextEditor, Link } from '@mantine/tiptap';
-import { useEditor } from '@tiptap/react';
-import {Highlight} from '@tiptap/extension-highlight';
-import {StarterKit}  from '@tiptap/starter-kit';
-import {Underline } from '@tiptap/extension-underline';
-import {TextAlign } from '@tiptap/extension-text-align';
-import {Superscript} from '@tiptap/extension-superscript';
-import {Subscript } from '@tiptap/extension-subscript';
 
 function Tiptap({props, refs}) {
 
-  console.log(refs);
-  const c =
-  '<h2 style="text-align: center;">Welcome to Mantine rich text editor</h2><p><code>RichTextEditor</code> component focuses on usability and is designed to be as simple as possible to bring a familiar editing experience to regular users. <code>RichTextEditor</code> is based on <a href="https://tiptap.dev/" rel="noopener noreferrer" target="_blank">Tiptap.dev</a> and supports all of its features:</p><ul><li>General text formatting: <strong>bold</strong>, <em>italic</em>, <u>underline</u>, <s>strike-through</s> </li><li>Headings (h1-h6)</li><li>Sub and super scripts (<sup>&lt;sup /&gt;</sup> and <sub>&lt;sub /&gt;</sub> tags)</li><li>Ordered and bullet lists</li><li>Text align&nbsp;</li><li>And all <a href="https://tiptap.dev/extensions" target="_blank" rel="noopener noreferrer">other extensions</a></li></ul>';
-
-  var content = `<h2 style="text-align: center;">${props.results.topic}</h2>`;
-  for (let i = 0; i < props.results.questions.length; i++) {
-    content += `<p>${props.results.questions[i]}</p>`;
-    if (props.results.solutions.length > 0) {
-      content += `<p>${props.results.solutions[i]}</p>`;
-    }
-    content += '<br/>';
-  }
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link,
-      Superscript,
-      Subscript,
-      Highlight,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-    ],
-    content,
-  });
-
   return (
-    <RichTextEditor editor={editor}>
+    <RichTextEditor editor={props.editor}>
       <RichTextEditor.Toolbar sticky stickyOffset={60}>
         <RichTextEditor.ControlsGroup>
           <RichTextEditor.Bold />

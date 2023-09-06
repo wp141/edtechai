@@ -25,7 +25,6 @@ export default function GenerateForm({props, refs}) {
                         label="Select Course"
                         data={props.courses.map((course) => ({value: course._id, label: course.name, key: course._id}))}
                         onChange={(event) => props.setCourse(event.currentTarget.value)}
-
                         />
                         <TextInput ref={refs.topicQ} label="Topic Area" placeholder="Topic"/>
                         
@@ -62,31 +61,36 @@ export default function GenerateForm({props, refs}) {
 
                 <Tabs.Panel value="assignment" pt="xs">
                 <form>
-                    {/* <TextInput ref={refs.topic} label="Topic Area" placeholder="Topic"/> */}
+                    <NativeSelect
+                        label="Select Course"
+                        data={props.courses.map((course) => ({value: course._id, label: course.name, key: course._id}))}
+                        onChange={(event) => props.setCourse(event.currentTarget.value)}
+                    />
+                    <TextInput ref={refs.topicA} label="Topic Area" placeholder="Topic"/>
                     <NativeSelect
                     label="Year Level"
                     data={["5","6","7","8","9","10","11","12"]}
                     defaultValue={"12"}
-                    ref={refs.year}
+                    ref={refs.yearA}
                     />
                     <NativeSelect
                     label="Difficulty Level"
                     data={["Easy", "Medium", "Hard"]}
                     defaultValue={"Easy"}
-                    ref={refs.difficulty}
+                    ref={refs.difficultyA}
                     />
                     <NativeSelect
                     label="Assessment Form"
                     data={["Written", "Video", "Oral"]}
-                    defaultValue={"Easy"}
-                    ref={refs.difficulty}
+                    defaultValue={"Written"}
+                    ref={refs.assessmentFormA}
                     />
-                    <NumberInput label="Number of Marks" defaultValue={20}/>
-                    <Radio.Group my="sm" defaultValue="individual">
-                    <Group>
-                        <Radio value="individual" label="Individual"/>
-                        <Radio value="group" label="Group"/>
-                    </Group>
+                    <NumberInput label="Number of Marks" defaultValue={20} ref={refs.marksA}/>
+                    <Radio.Group my="sm" defaultValue="individual" ref={refs.taskForA}>
+                        <Group>
+                            <Radio value="individual" label="Individual"/>
+                            <Radio value="group" label="Group"/>
+                        </Group>
                     </Radio.Group>
                     {/* <Checkbox my="sm" label="Generate Marking Criteria" defaultChecked={false}/> */}
                     <Button my="sm" variant="light" type="submit" disabled={props.generating}>Generate</Button>
@@ -96,22 +100,27 @@ export default function GenerateForm({props, refs}) {
 
                 <Tabs.Panel value="exam" pt="xs">
                 <form>
-                    {/* <TextInput ref={refs.topic} label="Topic Area" placeholder="Topic"/> */}
+                    <NativeSelect
+                        label="Select Course"
+                        data={props.courses.map((course) => ({value: course._id, label: course.name, key: course._id}))}
+                        onChange={(event) => props.setCourse(event.currentTarget.value)}
+                        />
+                    <TextInput ref={refs.topicE} label="Topic Area" placeholder="Topic"/>
                     <NativeSelect
                     label="Year Level"
                     data={["5","6","7","8","9","10","11","12"]}
                     defaultValue={"12"}
-                    ref={refs.year}
+                    ref={refs.yearE}
                     />
-                    {/* <NativeSelect
+                    <NativeSelect
                     label="Difficulty Level"
                     data={["Easy", "Medium", "Hard"]}
                     defaultValue={"Easy"}
-                    ref={difficulty}
-                    /> */}
-                    <NumberInput label="Number of Mulitple Choice Questions" defaultValue={10}/>
-                    <NumberInput label="Number of Short Answer Questions" defaultValue={5}/>
-                    <NumberInput label="Number of Essay Questions" defaultValue={1}/>
+                    ref={refs.difficultyE}
+                    />
+                    <NumberInput label="Number of Mulitple Choice Questions" defaultValue={10} ref={refs.multisE}/>
+                    <NumberInput label="Number of Short Answer Questions" defaultValue={5} ref={refs.shortsE}/>
+                    <NumberInput label="Number of Long Answer Questions" defaultValue={1} ref={refs.longsE}/>
                     <Button my="sm" variant="light" type="submit" disabled={props.generating}>Generate</Button>
                 </form>
                 </Tabs.Panel>
