@@ -124,10 +124,7 @@ def generate_questions():
     number = request.form.get("number")   
     year = request.form.get("year")   
     difficulty = request.form.get("difficulty")   
-    solutions = bool(request.form.get("solutions"))
-
-    print(topic)
-    # return "", 200
+    solutions = request.form.get("solutions")
 
     embeddings = OpenAIEmbeddings(model="text-embedding-ada-002")
     index = Pinecone.from_existing_index("dev", embeddings)
@@ -152,7 +149,7 @@ def generate_questions():
             question_arr.append(response)
     
     solution_arr = []
-    if solutions == True:
+    if solutions == "true":
         for i in range (0, len(question_arr)):
             query = f"""
             Generate a year {year} student level solution to the question "{question_arr[i]}".

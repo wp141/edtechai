@@ -22,11 +22,12 @@
     "@tiptap/pm": "^2.1.8",
     "@tiptap/react": "^2.1.8",
     "@tiptap/starter-kit": "^2.1.8",
+    "html-docx-js": "^0.3.1",
     "jspdf": "^2.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.15.0",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -54,6 +55,11 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+    "@babel/core": "^7.23.2",
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/preset-env": "^7.23.2",
+    "path": "^0.12.7",
+    "react-error-overlay": "^6.0.9",
+    "utils": "^0.3.1"
   }
 }

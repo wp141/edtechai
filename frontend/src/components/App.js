@@ -38,7 +38,7 @@ function App() {
 
   useEffect(() => {
     if (user) {
-      console.log("user: " + user.user_id);
+      console.log("user: " + (user.sub));
     }
   }, [user])
 
